@@ -13,6 +13,8 @@ import com.facebook.react.bridge.WritableMap;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import java.lang.Math;
+
 import android.media.MediaRecorder;
 import android.util.Log;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
@@ -98,6 +100,10 @@ class RNSoundLevelModule extends ReactContextBaseJavaModule {
     promise.resolve(true);
   }
 
+  private int AmplitudeTodB(double amplitude) {
+    return (int)(20.0f * Math.log10(amplitude));
+  }
+
   private void startTimer() {
     timer = new Timer();
     timer.scheduleAtFixedRate(new TimerTask() {
@@ -109,11 +115,11 @@ class RNSoundLevelModule extends ReactContextBaseJavaModule {
 
           int amplitude = recorder.getMaxAmplitude();
           if (amplitude == 0) {
-            body.putInt("value", -160);
+            body.putInt("value", 0);
             body.putInt("rawValue", 0);
           } else {
             body.putInt("rawValue", amplitude);
-            body.putInt("value", (int) (20 * Math.log(((double) amplitude) / 32767d)));
+            body.putInt("value", AmplitudeTodB(amplitude));
           }
 
           sendEvent("frame", body);
